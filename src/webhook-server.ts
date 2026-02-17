@@ -96,22 +96,27 @@ export class WebhookServer {
   private handleGithubWebhook(req: http.IncomingMessage, res: http.ServerResponse, rawBody: Buffer): void {
     // Verify signature
     const secret = config.github.webhookSecret;
-    if (secret) {
-      const signature = req.headers['x-hub-signature-256'] as string | undefined;
-      if (!signature) {
-        this.logger.warn('GitHub webhook missing signature');
-        res.writeHead(401, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Missing signature' }));
-        return;
-      }
+    if (!secret) {
+      this.logger.warn('GitHub webhook secret not configured, rejecting request');
+      res.writeHead(503, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Webhook secret not configured' }));
+      return;
+    }
 
-      const expected = 'sha256=' + crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
-      if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
-        this.logger.warn('GitHub webhook invalid signature');
-        res.writeHead(401, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Invalid signature' }));
-        return;
-      }
+    const signature = req.headers['x-hub-signature-256'] as string | undefined;
+    if (!signature) {
+      this.logger.warn('GitHub webhook missing signature');
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Missing signature' }));
+      return;
+    }
+
+    const expected = 'sha256=' + crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+    if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
+      this.logger.warn('GitHub webhook invalid signature');
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Invalid signature' }));
+      return;
     }
 
     // Deduplicate by delivery ID
@@ -146,24 +151,29 @@ export class WebhookServer {
   }
 
   private handlePlankaWebhook(req: http.IncomingMessage, res: http.ServerResponse, rawBody: Buffer): void {
-    // Verify secret if configured
+    // Verify secret
     const secret = config.planka.webhookSecret;
-    if (secret) {
-      const signature = req.headers['x-webhook-signature'] as string | undefined;
-      if (!signature) {
-        this.logger.warn('Planka webhook missing signature');
-        res.writeHead(401, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Missing signature' }));
-        return;
-      }
+    if (!secret) {
+      this.logger.warn('Planka webhook secret not configured, rejecting request');
+      res.writeHead(503, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Webhook secret not configured' }));
+      return;
+    }
 
-      const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
-      if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
-        this.logger.warn('Planka webhook invalid signature');
-        res.writeHead(401, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Invalid signature' }));
-        return;
-      }
+    const signature = req.headers['x-webhook-signature'] as string | undefined;
+    if (!signature) {
+      this.logger.warn('Planka webhook missing signature');
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Missing signature' }));
+      return;
+    }
+
+    const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+    if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
+      this.logger.warn('Planka webhook invalid signature');
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Invalid signature' }));
+      return;
     }
 
     let payload: any;
