@@ -230,7 +230,20 @@ export class Heartbeat {
   private async checkBeszelHealth(): Promise<void> {
     if (!config.beszel.enabled) return;
 
-    const systemIds = config.beszel.systemIds;
+    let systemIds = config.beszel.systemIds;
+
+    // If no explicit system IDs configured, discover all systems
+    if (systemIds.length === 0) {
+      const systemsJson = this.execCommand('beszel systems -j');
+      if (!systemsJson) return;
+      try {
+        const systems = JSON.parse(systemsJson);
+        systemIds = systems.map((s: any) => s.name || s.id);
+      } catch {
+        return;
+      }
+    }
+
     if (systemIds.length === 0) return;
 
     try {

@@ -134,7 +134,7 @@ FREESCOUT_MAILBOX_ID=1
 FREESCOUT_NOTIFY_SLACK_CHANNEL=#support
 
 # Optional — Beszel
-BESZEL_SYSTEM_IDS=system1,system2
+# BESZEL_SYSTEM_IDS=system1,system2  # optional — monitors all systems if unset
 BESZEL_NOTIFY_SLACK_CHANNEL=#infra
 
 # Optional — Webhook server
