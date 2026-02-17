@@ -25,6 +25,9 @@ export const config = {
     repos: (process.env.GITHUB_REPOS || '').split(',').filter(Boolean),
     botUsername: process.env.GITHUB_BOT_USERNAME || '',
     notifySlackChannel: process.env.GITHUB_NOTIFY_SLACK_CHANNEL || '',
+    appId: process.env.GITHUB_APP_ID || '',
+    privateKey: (process.env.GITHUB_APP_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
+    installationId: process.env.GITHUB_APP_INSTALLATION_ID || '',
   },
 
   // --- New: Planka webhook integration ---

@@ -11,6 +11,7 @@ import { GithubHandler } from './github-handler.js';
 import { PlankaHandler } from './planka-handler.js';
 import { Heartbeat } from './heartbeat.js';
 import { Scheduler } from './scheduler.js';
+import { startGitHubTokenRefresh } from './github-auth.js';
 
 const logger = new Logger('Main');
 
@@ -18,6 +19,7 @@ let app: App;
 let webhookServer: WebhookServer;
 let heartbeat: Heartbeat;
 let scheduler: Scheduler;
+let githubTokenRefresh: NodeJS.Timeout | null = null;
 
 async function start() {
   try {
@@ -28,6 +30,9 @@ async function start() {
       useBedrock: config.claude.useBedrock,
       useVertex: config.claude.useVertex,
     });
+
+    // 0. Start GitHub App token refresh (if configured)
+    githubTokenRefresh = startGitHubTokenRefresh(config.github);
 
     // 1. Initialize Slack app (existing)
     app = new App({
@@ -110,6 +115,7 @@ async function start() {
 async function shutdown(signal: string) {
   logger.info(`Received ${signal}, shutting down...`);
   try {
+    if (githubTokenRefresh) clearInterval(githubTokenRefresh);
     scheduler?.stop();
     heartbeat?.stop();
     await webhookServer?.stop();
