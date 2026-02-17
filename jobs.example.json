@@ -1,0 +1,20 @@
+[
+  {
+    "name": "weekly-retention-summary",
+    "schedule": "0 9 * * 1",
+    "prompt": "Run `metabase query 7 \"SELECT toStartOfWeek(time) as week, COUNT(DISTINCT user_id) FROM events WHERE time >= today() - 30 GROUP BY week ORDER BY week\"` and send a summary of weekly active user trends. Highlight any significant changes.",
+    "slackChannel": "#analytics"
+  },
+  {
+    "name": "daily-error-digest",
+    "schedule": "0 8 * * *",
+    "prompt": "Check recent errors using `metabase query 3 \"SELECT message, COUNT(*) as cnt FROM errors WHERE created_at >= today() - 1 GROUP BY message ORDER BY cnt DESC LIMIT 10\"` and summarize the top issues.",
+    "slackChannel": "#errors"
+  },
+  {
+    "name": "seo-weekly-report",
+    "schedule": "0 10 * * 1",
+    "prompt": "Run `gsc top-queries -s https://example.com -l 20` and `gsc top-pages -s https://example.com -l 20` and provide a weekly SEO summary with notable changes.",
+    "slackChannel": "#seo"
+  }
+]
