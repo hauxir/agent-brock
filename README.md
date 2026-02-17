@@ -2,7 +2,11 @@
   <img src="https://avatars.githubusercontent.com/u/261835704?v=4" width="200" />
 </p>
 
-<h1 align="center">Agent Brock</h1>
+<h1 align="center">Agent BROCK</h1>
+
+<p align="center">
+  <b>B</b>ridging <b>R</b>epos, <b>O</b>ps, <b>C</b>hat, and <b>K</b>anban
+</p>
 
 <p align="center">
   Autonomous software engineering agent — Slack bot + GitHub webhooks + Planka webhooks + proactive heartbeat
